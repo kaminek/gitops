@@ -1,0 +1,60 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: workload-guestbook
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  generators:
+    - merge:
+        mergeKeys:
+          - server
+        generators:
+          - clusters:
+              values:
+                chartName: guestbook
+              selector:
+                matchExpressions:
+                  - key: region
+                    operator: In
+                    values:
+                      - "eu-west-1"
+          - clusters:
+              selector:
+                matchExpressions:
+                  - key: environment
+                    operator: In
+                    values:
+                      - "production"
+  template:
+    metadata:
+      name: "addon-{{.name}}-guestbook"
+      labels:
+        chartName: "{{.values.chartName}}"
+        appsetFileName: "guestbook-appset"
+        environment: "{{.metadata.labels.environment}}"
+        type: "workload"
+    spec:
+      project: default
+      sources:
+        - repoURL: "github.com/kaminek/gitops"
+          targetRevision: "HEAD"
+          ref: values
+        - repoURL: "github.com/kaminek/gitops"
+          targetRevision: "HEAD"
+          path: gitops/charts/{{.values.chartName}}
+          helm:
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/gitops/environments/{{.metadata.labels.environment}}/workloads/{{.values.chartName}}/values.yaml
+              - $values/gitops/clusters/{{.name}}/workloads/{{.values.chartName}}/values.yaml
+      destination:
+        namespace: "{{.values.chartName}}"
+        name: "{{.name}}"
+      syncPolicy:
+        automated: {}
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true # Big CRDs.
