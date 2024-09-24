@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: workload-guestbook
+  name: guestbook
 spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]
@@ -30,7 +30,7 @@ spec:
                       - "production"
   template:
     metadata:
-      name: "addon-{{.name}}-guestbook"
+      name: "{{.name}}-guestbook"
       labels:
         chartName: "{{.values.chartName}}"
         appsetFileName: "guestbook-appset"
@@ -40,16 +40,13 @@ spec:
       project: default
       sources:
         - repoURL: "github.com/kaminek/gitops"
-          targetRevision: "HEAD"
-          ref: values
-        - repoURL: "github.com/kaminek/gitops"
-          targetRevision: "HEAD"
-          path: gitops/charts/{{.values.chartName}}
+          targetRevision: HEAD
+          path: charts/{{.values.chartName}}
           helm:
             ignoreMissingValueFiles: true
             valueFiles:
-              - $values/gitops/environments/{{.metadata.labels.environment}}/workloads/{{.values.chartName}}/values.yaml
-              - $values/gitops/clusters/{{.name}}/workloads/{{.values.chartName}}/values.yaml
+              - gitops/environments/{{.metadata.labels.environment}}/apps/{{.values.chartName}}/values.yaml
+              - gitops/clusters/{{.name}}/apps/{{.values.chartName}}/values.yaml
       destination:
         namespace: "{{.values.chartName}}"
         name: "{{.name}}"
@@ -57,4 +54,4 @@ spec:
         automated: {}
         syncOptions:
           - CreateNamespace=true
-          - ServerSideApply=true # Big CRDs.
+          - ServerSideApply=true
