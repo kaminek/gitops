@@ -30,7 +30,7 @@ spec:
                       - "production"
   template:
     metadata:
-      name: "{{.name}}-guestbook"
+      name: "{{.nameNormalized}}-guestbook"
       labels:
         chartName: "{{.values.chartName}}"
         appsetFileName: "guestbook-appset"
