@@ -39,7 +39,7 @@ spec:
     spec:
       project: default
       sources:
-        - repoURL: "github.com/kaminek/gitops"
+        - repoURL: "https://github.com/kaminek/gitops"
           targetRevision: HEAD
           path: charts/{{.values.chartName}}
           helm:
