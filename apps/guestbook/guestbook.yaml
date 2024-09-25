@@ -43,6 +43,7 @@ spec:
           targetRevision: HEAD
           path: charts/{{.values.chartName}}
           helm:
+            releaseName: "{{ .values.chartName }}"
             ignoreMissingValueFiles: true
             valueFiles:
               - gitops/environments/{{.metadata.labels.environment}}/apps/{{.values.chartName}}/values.yaml
