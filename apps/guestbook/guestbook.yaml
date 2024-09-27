@@ -41,13 +41,21 @@ spec:
       sources:
         - repoURL: "https://github.com/kaminek/gitops"
           targetRevision: HEAD
-          path: charts/{{.values.chartName}}
+          # path: "charts/{{.values.chartName}}"
+          path: "charts/guestbook"
           helm:
             releaseName: "{{ .values.chartName }}"
             ignoreMissingValueFiles: true
             valueFiles:
               - gitops/environments/{{.metadata.labels.environment}}/apps/{{.values.chartName}}/values.yaml
               - gitops/clusters/{{.name}}/apps/{{.values.chartName}}/values.yaml
+            values: |
+              tolerations:
+                - key: "eks-addons"
+                  operator: "Exists"
+                  effect: "NoSchedule"
+              nodeSelector:
+                karpenter.sh/nodepool: eks-addons
       destination:
         namespace: "{{.values.chartName}}"
         name: "{{.name}}"
