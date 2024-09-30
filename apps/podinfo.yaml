@@ -16,8 +16,11 @@ spec:
               values:
                 version: 6.6.0
               selector:
-                matchLabels:
-                  region: use1
+                matchExpressions:
+                  - key: environment
+                    operator: In
+                    values:
+                      - "production"
           - clusters:
               values:
                 version: 6.7.0
@@ -26,14 +29,14 @@ spec:
                   - key: region
                     operator: In
                     values:
-                      - "euw1"
+                      - "use1"
           - clusters:
               selector:
                 matchExpressions:
-                  - key: environment
+                  - key: region
                     operator: In
                     values:
-                      - "production"
+                      - "euw1"
   template:
     metadata:
       name: "{{.nameNormalized}}-podinfo"
