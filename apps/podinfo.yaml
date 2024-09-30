@@ -16,11 +16,8 @@ spec:
               values:
                 version: 6.6.0
               selector:
-                matchExpressions:
-                  - key: region
-                    operator: In
-                    values:
-                      - "use1"
+                matchLabels:
+                  region: use1
           - clusters:
               values:
                 version: 6.7.0
