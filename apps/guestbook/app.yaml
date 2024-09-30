@@ -1,0 +1,64 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: podinfo
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  generators:
+    - merge:
+        mergeKeys:
+          - server
+        generators:
+          - clusters:
+              values:
+                version: 15.9.0
+              selector:
+                matchExpressions:
+                  - key: region
+                    operator: In
+                    values:
+                      - "euw1"
+          - clusters:
+              selector:
+                matchExpressions:
+                  - key: environment
+                    operator: In
+                    values:
+                      - "production"
+  template:
+    metadata:
+      name: "{{.nameNormalized}}-podinfo"
+      labels:
+        environment: "{{.metadata.labels.environment}}"
+        region: "{{.metadata.labels.region}}"
+        type: app
+    spec:
+      project: default
+      source:
+        repoURL: registry-1.docker.io/bitnamicharts
+        chart: nginx
+        targetRevision: "{{.values.version}}"
+        helm:
+          releaseName: podinfo
+          ignoreMissingValueFiles: true
+          valueFiles:
+            - environments/{{.metadata.labels.environment}}/apps/podinfo/values.yaml
+            - clusters/{{.nameNormalized}}-{{.metadata.labels.region}}/apps/podinfo/values.yaml
+          valuesObject:
+            tolerations:
+              - key: "eks-addons"
+                operator: "Exists"
+                effect: "NoSchedule"
+            nodeSelector:
+              karpenter.sh/nodepool: eks-addons
+      destination:
+        namespace: podinfo
+        name: "{{.name}}"
+      syncPolicy:
+        automated: {}
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
