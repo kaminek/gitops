@@ -20,7 +20,7 @@ spec:
                   - key: region
                     operator: In
                     values:
-                      - "eu-west-1"
+                      - "euw1"
           - clusters:
               selector:
                 matchExpressions:
