@@ -30,7 +30,7 @@ spec:
                       - "production"
   template:
     metadata:
-      name: "{{.nameNormalized}}/podinfo"
+      name: "{{.nameNormalized}}-podinfo"
       labels:
         environment: "{{.metadata.labels.environment}}"
         region: "{{.metadata.labels.region}}"
