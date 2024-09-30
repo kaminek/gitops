@@ -14,7 +14,7 @@ spec:
         generators:
           - clusters:
               values:
-                version: 15.9.0
+                version: 6.7.0
               selector:
                 matchExpressions:
                   - key: region
@@ -38,15 +38,15 @@ spec:
     spec:
       project: default
       source:
-        repoURL: registry-1.docker.io/bitnamicharts
-        chart: nginx
+        repoURL: ghcr.io/stefanprodan/charts/podinfo
+        chart: podinfo
         targetRevision: "{{.values.version}}"
         helm:
           releaseName: podinfo
           ignoreMissingValueFiles: true
           valueFiles:
             - environments/{{.metadata.labels.environment}}/apps/podinfo/values.yaml
-            - clusters/{{.nameNormalized}}-{{.metadata.labels.region}}/apps/podinfo/values.yaml
+            - clusters/{{.name}}-{{.metadata.labels.region}}/apps/podinfo/values.yaml
           valuesObject:
             tolerations:
               - key: "eks-addons"
