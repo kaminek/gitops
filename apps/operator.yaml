@@ -1,0 +1,36 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: operators
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  syncPolicy:
+    preserveResourcesOnDeletion: true
+  generators:
+    - git:
+        directories:
+          - path: operators/*
+        repoURL: https://github.com/kaminek/gitops
+        revision: HEAD
+  template:
+    metadata:
+      name: "{{.path.basename}}"
+    spec:
+      project: default
+      source:
+        repoURL: "https://github.com/kaminek/gitops"
+        targetRevision: HEAD
+        path: "{{.path.path}}"
+      destination:
+        namespace: "{{.path.basename}}"
+        name: in-cluster
+      syncPolicy:
+        automated:
+          allowEmpty: true
+          prune: false
+        syncOptions:
+          - ServerSideApply=true
+          - CreateNamespace=true
