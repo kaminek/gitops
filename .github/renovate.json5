@@ -1,0 +1,30 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "docker:enableMajor",
+    "replacements:k8s-registry-move",
+    ":automergeBranch",
+    ":disableRateLimiting",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":skipStatusChecks",
+    ":timezone(Europe/Paris)",
+    "github>kaminek/gitops//.github/renovate/allowedVersions.json5",
+    "github>kaminek/gitops//.github/renovate/autoMerge.json5",
+    "github>kaminek/gitops//.github/renovate/operators.json5",
+    "github>kaminek/gitops//.github/renovate/commitMessage.json5",
+    "github>kaminek/gitops//.github/renovate/labels.json5",
+    "github>kaminek/gitops//.github/renovate/semanticCommits.json5"
+  ],
+  "dependencyDashboardTitle": "Renovate Dashboard 🤖",
+  "suppressNotifications": ["prEditedNotification", "prIgnoreNotification"],
+  "onboarding": false,
+  "requireConfig": "ignored",
+  "ignorePaths": ["**/*.sops.*", "**/.archive/**", "**/resources/**"],
+  "kubernetes": {
+    "fileMatch": [
+      "(^|/)operators/.+\\.ya?ml(?:\\.j2)?$",
+    ]
+  }
+}
