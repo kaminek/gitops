@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: operator-kafka-rtb-v1-euw1
+  labels:
+    app: alpine-sleep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alpine-sleep
+  template:
+    metadata:
+      labels:
+        app: alpine-sleep
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: alpine
+          image: ghcr.io/kaminek/alpine:v1.0.0
+          command: ["sh", "-c"]
+          args:
+            - "echo 'Alpine pod running'; sleep 999999"
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: kafka-config-volume
+              mountPath: /etc/kafka/config.yaml
+              subPath: config.yaml
+      volumes:
+        - name: kafka-config-volume
+          configMap:
+            name: kafka-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-config
+data:
+  config.yaml: |
+    kafka:
+      broker: "localhost:9092"
+      topic: "example-topic"
+      consumer:
+        group: "example-group"
+      producer:
+        retries: 5
